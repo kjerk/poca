@@ -11,6 +11,8 @@ import (
 	"golang.org/x/term"
 )
 
+var version = "0.0.0" // Build time
+
 const (
 	fillChar         = "─"
 	sectionOpenChar  = "┐"
