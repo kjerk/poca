@@ -19,9 +19,9 @@ var (
 	sectionStartFlag = pflag.Bool("section-start", false, "Print section start divider")
 	sectionEndFlag   = pflag.Bool("section-end", false, "Print section end divider")
 	headerFlag       = pflag.BoolP("header", "h", false, "Print header (alias for section-start)")
-	footerFlag       = pflag.Bool("footer", false, "Print footer (alias for section-end)")
+	footerFlag       = pflag.BoolP("footer", "f", false, "Print footer (alias for section-end)")
 	presetFlag       = pflag.StringP("preset", "p", "default", "Preset style name")
-	widthFlag        = pflag.Int("width", 0, "Override terminal width")
+	widthFlag        = pflag.IntP("width", "w", 0, "Override terminal width")
 	versionFlag      = pflag.Bool("version", false, "Print version and exit")
 )
 
