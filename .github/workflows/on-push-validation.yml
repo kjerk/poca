@@ -1,4 +1,4 @@
-name: CI
+name: CHECK - Push Validation
 
 on:
   push:
@@ -12,24 +12,27 @@ permissions:
 jobs:
   check:
     name: Build & Check
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: SETUP - Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - name: SETUP - Go
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
 
-      - name: Build
+      - name: BUILD - Compile binary
         run: go build ./cmd/poca
 
-      - name: Vet
+      - name: CHECK - Vet
         run: go vet ./...
 
-      - name: Test
+      - name: CHECK - Test
         run: go test ./...
 
-      - name: Lint
+      - name: CHECK - Lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest

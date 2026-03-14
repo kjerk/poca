@@ -1,4 +1,4 @@
-name: Publish
+name: DEPLOY - Publish
 
 on:
   workflow_dispatch:
@@ -7,6 +7,14 @@ on:
         description: "Release tag to publish (e.g. v1.0.0)"
         required: true
         type: string
+      dry_run:
+        description: "Dry run only - no publish (default: true)"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 permissions:
   contents: read
@@ -14,18 +22,36 @@ permissions:
 jobs:
   publish:
     name: Publish Release
+    if: github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: SETUP - Checkout
+        uses: actions/checkout@v4
 
-      - name: Download release assets
+      - name: FETCH - Download release assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p dist
           gh release download "${{ inputs.release_tag }}" --dir dist
 
-      - name: Publish
+      - name: DEBUG - List downloaded artifacts
+        run: |
+          echo "=== Release: ${{ inputs.release_tag }} ==="
+          ls -la dist/
+
+      - name: DRY RUN - Would publish (skipped)
+        if: inputs.dry_run == 'true'
+        run: |
+          echo "=== DRY RUN MODE ==="
+          echo "Would publish release: ${{ inputs.release_tag }}"
+          echo "Artifacts:"
+          ls -la dist/
+          echo ""
+          echo "To actually publish, re-run with dry_run=false"
+
+      - name: DEPLOY - Publish
+        if: inputs.dry_run == 'false'
         run: |
           echo "TODO: Publish artifacts from dist/ to your target registry"
           echo "Release: ${{ inputs.release_tag }}"
