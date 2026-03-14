@@ -1,4 +1,4 @@
-module Poca
+module poca
 
 go 1.25.0
 

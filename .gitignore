@@ -10,6 +10,7 @@
 # Repo files
 /_reference/
 /_scratch/
+/dist/
 
 # Logs
 logs/
@@ -22,6 +23,9 @@ logs/
 /.claude/
 /.codex/
 .cursorrules
+
+# Build output
+/build/
 
 # Go Template Below ================================================================================
 

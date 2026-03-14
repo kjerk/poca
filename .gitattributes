@@ -9,6 +9,7 @@
 
 *.asciidoc text eol=lf
 *.cs text eol=lf
+*.go text eol=lf
 *.css text eol=lf
 *.cshtml text eol=lf
 *.js text eol=lf

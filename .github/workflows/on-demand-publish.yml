@@ -1,0 +1,32 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to publish (e.g. v1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p dist
+          gh release download "${{ inputs.release_tag }}" --dir dist
+
+      - name: Publish
+        run: |
+          echo "TODO: Publish artifacts from dist/ to your target registry"
+          echo "Release: ${{ inputs.release_tag }}"
+          ls -la dist/
