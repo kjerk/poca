@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/gookit/color"
 	"github.com/spf13/pflag"
 	"golang.org/x/term"
 )
@@ -28,15 +27,8 @@ var (
 	headerFlag       = pflag.BoolP("header", "h", false, "Print header (alias for section-start)")
 	footerFlag       = pflag.Bool("footer", false, "Print footer (alias for section-end)")
 	widthFlag        = pflag.Int("width", 0, "Override terminal width")
+	versionFlag      = pflag.Bool("version", false, "Print version and exit")
 )
-
-var symbols = map[string]string{
-	"check":   "✓",
-	"cross":   "✗",
-	"arrow":   "→",
-	"warning": "⚠",
-	"info":    "ℹ",
-}
 
 func buildSectionDivider(message string, width int, terminator string) string {
 	if message == "" {
@@ -68,6 +60,11 @@ func determineWidth() int {
 func main() {
 	pflag.Parse()
 
+	if *versionFlag {
+		fmt.Println(version)
+		os.Exit(0)
+	}
+
 	// Handle aliases
 	if *headerFlag {
 		*sectionStartFlag = true
@@ -88,7 +85,7 @@ func main() {
 		}
 		message = buildSectionDivider("", width, sectionCloseChar)
 	} else if *symbolFlag != "" {
-		if sym, ok := symbols[*symbolFlag]; ok {
+		if sym, ok := symbols[normalize(*symbolFlag)]; ok {
 			message = sym + " " + message
 		} else {
 			fmt.Fprintf(os.Stderr, "Unknown symbol: %s\n", *symbolFlag)
@@ -99,13 +96,11 @@ func main() {
 	isInteractive := term.IsTerminal(int(os.Stdout.Fd()))
 
 	if isInteractive && (*colorFlag != "" || len(*styleFlags) > 0) {
-		var styleList []color.Color
+		var codes []uint8
 
 		if *colorFlag != "" {
-			if c, ok := color.FgColors[*colorFlag]; ok {
-				styleList = append(styleList, c)
-			} else if c, ok := color.ExFgColors[*colorFlag]; ok {
-				styleList = append(styleList, c)
+			if code, ok := colors[normalize(*colorFlag)]; ok {
+				codes = append(codes, code)
 			} else {
 				fmt.Fprintf(os.Stderr, "Unknown color: %s\n", *colorFlag)
 				os.Exit(1)
@@ -113,15 +108,15 @@ func main() {
 		}
 
 		for _, s := range *styleFlags {
-			if style, ok := color.AllOptions[s]; ok {
-				styleList = append(styleList, style)
+			if code, ok := styles[normalize(s)]; ok {
+				codes = append(codes, code)
 			} else {
 				fmt.Fprintf(os.Stderr, "Unknown style: %s\n", s)
 				os.Exit(1)
 			}
 		}
 
-		color.New(styleList...).Println(message)
+		fmt.Println(ansiWrap(message, codes))
 	} else {
 		fmt.Println(message)
 	}
