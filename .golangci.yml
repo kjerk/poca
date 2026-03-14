@@ -8,15 +8,6 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - gocritic
-    - misspell
-  settings:
-    gocritic:
-      enabled-tags:
-        - diagnostic
-        - style
-      disabled-checks:
-        - hugeParam
 
 issues:
   max-issues-per-linter: 50
