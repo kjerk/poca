@@ -59,7 +59,7 @@ jobs:
           cat checksums-sha256.txt
 
       - name: PROVENANCE - Attest build artifacts
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: 'poca-*'
 
