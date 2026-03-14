@@ -95,6 +95,13 @@ func determineWidth() int {
 func main() {
 	pflag.Parse()
 
+	// Env vars as defaults when flags aren't explicitly set
+	if !pflag.CommandLine.Changed("preset") {
+		if env := os.Getenv("POCA_PRESET"); env != "" {
+			*presetFlag = env
+		}
+	}
+
 	if *versionFlag {
 		fmt.Println(version)
 		os.Exit(0)
