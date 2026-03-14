@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+env:
+  ENABLE_ATTESTATION: false
+
 permissions:
   contents: write
   id-token: write
@@ -59,6 +62,7 @@ jobs:
           cat checksums-sha256.txt
 
       - name: PROVENANCE - Attest build artifacts
+        if: env.ENABLE_ATTESTATION == 'true'
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: 'poca-*'
