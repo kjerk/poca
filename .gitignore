@@ -10,7 +10,6 @@
 # Repo files
 /_reference/
 /_scratch/
-/dist/
 
 # Logs
 logs/
@@ -26,6 +25,7 @@ logs/
 
 # Build output
 /build/
+/dist/
 
 # Go Template Below ================================================================================
 
