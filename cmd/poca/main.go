@@ -12,12 +12,6 @@ import (
 
 var version = "0.0.0" // Build time
 
-const (
-	fillChar         = "─"
-	sectionOpenChar  = "┐"
-	sectionCloseChar = "┘"
-)
-
 var (
 	colorFlag        = pflag.String("color", "", "Text color")
 	styleFlags       = pflag.StringSlice("style", nil, "Text style (can be repeated)")
@@ -26,21 +20,62 @@ var (
 	sectionEndFlag   = pflag.Bool("section-end", false, "Print section end divider")
 	headerFlag       = pflag.BoolP("header", "h", false, "Print header (alias for section-start)")
 	footerFlag       = pflag.Bool("footer", false, "Print footer (alias for section-end)")
+	presetFlag       = pflag.StringP("preset", "p", "default", "Preset style name")
 	widthFlag        = pflag.Int("width", 0, "Override terminal width")
 	versionFlag      = pflag.Bool("version", false, "Print version and exit")
 )
 
-func buildSectionDivider(message string, width int, terminator string) string {
-	if message == "" {
-		return strings.Repeat(fillChar, width-1) + terminator
+// renderLine builds a single line from a LineTemplate, filling to the target width.
+// If text is non-empty, it is placed after the prefix with fill on either side per alignment.
+func renderLine(template LineTemplate, text string, width int, align string) string {
+	prefixLen := utf8.RuneCountInString(template.Prefix)
+	suffixLen := utf8.RuneCountInString(template.Suffix)
+	endCapLen := utf8.RuneCountInString(template.EndCap)
+	fillSpace := width - prefixLen - suffixLen - endCapLen
+
+	if fillSpace < 0 {
+		fillSpace = 0
 	}
 
-	prefix := fillChar + " " + message + " " + fillChar
-	remaining := width - utf8.RuneCountInString(prefix) - 1
-	if remaining > 0 {
-		return prefix + strings.Repeat(fillChar, remaining) + terminator
+	if text == "" {
+		fill := strings.Repeat(template.FillChar, fillSpace)
+		return template.Prefix + fill + template.Suffix + template.EndCap
 	}
-	return prefix[:width-1] + terminator
+
+	textWithPad := " " + text + " "
+	textLen := utf8.RuneCountInString(textWithPad)
+	remaining := fillSpace - textLen
+
+	if remaining < 0 {
+		remaining = 0
+	}
+
+	var fill string
+	switch align {
+	case "center":
+		leftFill := remaining / 2
+		rightFill := remaining - leftFill
+		fill = strings.Repeat(template.FillChar, leftFill) + textWithPad + strings.Repeat(template.FillChar, rightFill)
+	case "right":
+		fill = strings.Repeat(template.FillChar, remaining) + textWithPad
+	default: // left
+		fill = template.FillChar + textWithPad + strings.Repeat(template.FillChar, remaining-1)
+	}
+
+	return template.Prefix + fill + template.Suffix + template.EndCap
+}
+
+// renderSection renders a full section (header or footer) using its template.
+func renderSection(section SectionTemplate, text string, width int) string {
+	var lines []string
+
+	if section.LeadLine != nil {
+		lines = append(lines, renderLine(*section.LeadLine, "", width, section.TextAlign))
+	}
+
+	lines = append(lines, renderLine(section.MainLine, text, width, section.TextAlign))
+
+	return strings.Join(lines, "\n")
 }
 
 func determineWidth() int {
@@ -73,17 +108,25 @@ func main() {
 		*sectionEndFlag = true
 	}
 
-	message := strings.Join(pflag.Args(), " ")
+	preset, ok := presets[normalize(*presetFlag)]
+	if !ok {
+		fmt.Fprintf(os.Stderr, "Unknown preset: %s\n", *presetFlag)
+		os.Exit(1)
+	}
 
+	message := strings.Join(pflag.Args(), " ")
 	width := determineWidth()
 
 	if *sectionStartFlag {
-		message = buildSectionDivider(message, width, sectionOpenChar)
-	} else if *sectionEndFlag {
-		if *colorFlag == "" {
-			*colorFlag = "blue"
+		if *colorFlag == "" && preset.Header.DefaultColor != "" {
+			*colorFlag = preset.Header.DefaultColor
 		}
-		message = buildSectionDivider("", width, sectionCloseChar)
+		message = renderSection(preset.Header, message, width)
+	} else if *sectionEndFlag {
+		if *colorFlag == "" && preset.Footer.DefaultColor != "" {
+			*colorFlag = preset.Footer.DefaultColor
+		}
+		message = renderSection(preset.Footer, "", width)
 	} else if *symbolFlag != "" {
 		if sym, ok := symbols[normalize(*symbolFlag)]; ok {
 			message = sym + " " + message
