@@ -13,9 +13,9 @@ import (
 var version = "0.0.0" // Build time
 
 var (
-	colorFlag        = pflag.String("color", "", "Text color")
-	styleFlags       = pflag.StringSlice("style", nil, "Text style (can be repeated)")
-	symbolFlag       = pflag.String("symbol", "", "Prepend a symbol")
+	colorFlag        = pflag.StringP("color", "c", "", "Text color")
+	styleFlags       = pflag.StringSliceP("style", "s", nil, "Text style (can be repeated)")
+	symbolFlag       = pflag.StringP("symbol", "S", "", "Prepend a symbol")
 	sectionStartFlag = pflag.Bool("section-start", false, "Print section start divider")
 	sectionEndFlag   = pflag.Bool("section-end", false, "Print section end divider")
 	headerFlag       = pflag.BoolP("header", "h", false, "Print header (alias for section-start)")
