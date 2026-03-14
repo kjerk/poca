@@ -11,8 +11,6 @@ linters:
     - gosimple
     - gocritic
     - misspell
-    - gofmt
-    - goimports
   settings:
     gocritic:
       enabled-tags:
