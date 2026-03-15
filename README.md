@@ -2,7 +2,7 @@
 
 Colored terminal output, sections, and symbols for shell scripts. One binary, no runtime, no manual escape codes.
 
-<img src="docs/assets/poca_demo.png" width="480">
+<img src="docs/assets/poca_demo.png" width="640">
 
 ## The problem
 
