@@ -109,6 +109,10 @@ jobs:
 
           cat release-notes.md
 
+      - name: BUILD - Audit release notes for authenticity # lol
+        if: steps.check.outputs.found == 'true'
+        run: sed -i 's/—/-/g' release-notes.md
+
       - name: DEPLOY - Update release body
         if: steps.check.outputs.found == 'true'
         env:
