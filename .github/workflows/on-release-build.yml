@@ -4,9 +4,6 @@ on:
   release:
     types: [published]
 
-env:
-  ENABLE_ATTESTATION: true
-
 permissions:
   contents: write
   id-token: write
@@ -45,8 +42,7 @@ jobs:
         run: ls -la poca-*
 
       - name: PROVENANCE - Attest build artifacts
-        if: env.ENABLE_ATTESTATION == 'true'
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest@v4
         with:
           subject-path: 'poca-*'
 
