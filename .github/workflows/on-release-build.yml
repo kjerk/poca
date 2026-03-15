@@ -51,7 +51,7 @@ jobs:
           subject-path: 'poca-*'
 
       - name: DEPLOY - Upload binary as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: poca-${{ matrix.os }}-${{ matrix.arch }}
           path: poca-*
@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: FETCH - Download all build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: poca-*
           merge-multiple: true
