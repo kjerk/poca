@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  ENABLE_ATTESTATION: false
+  ENABLE_ATTESTATION: true
 
 permissions:
   contents: write
