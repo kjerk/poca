@@ -1,11 +1,12 @@
 package main
 
-// LineTemplate defines how a single line of a section is rendered.
+// LineTemplate - {Prefix}( Message )({FillChar}...){Suffix}{EndCap}
+// [─][ Section Title ][───────────────────────────────────────][┐]
 type LineTemplate struct {
-	Prefix   string // Fixed string at the start of the line
-	Suffix   string // Fixed string at the end of the line
-	FillChar string // Character used to fill remaining width
-	EndCap   string // Single character at the far right (after fill)
+	Prefix   string
+	Suffix   string
+	FillChar string
+	EndCap   string
 }
 
 // SectionTemplate defines the visual structure of a header or footer.
@@ -16,7 +17,7 @@ type SectionTemplate struct {
 	TextAlign    string        // "left", "center", "right"
 }
 
-// Preset is a named pair of header and footer styles.
+// Preset combines header and footer settings into a cohesive style for a section.
 type Preset struct {
 	Header SectionTemplate
 	Footer SectionTemplate
@@ -24,6 +25,7 @@ type Preset struct {
 
 var presets = map[string]Preset{
 	// ─ Section Title ─────────────────────────────────────────┐
+	// ... Section Content ...
 	// ─────────────────────────────────────────────────────────┘
 	"default": {
 		Header: SectionTemplate{
@@ -44,6 +46,7 @@ var presets = map[string]Preset{
 	},
 
 	// ━ Section Title ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+	// ... Section Content ...
 	// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 	"bold": {
 		Header: SectionTemplate{

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/term"
 )
 
-var version = "0.0.0" // Build time
+var version = "0.0.0" // Set at build time
 
 var (
 	colorFlag        = pflag.StringP("color", "c", "", "Text color")

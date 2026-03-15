@@ -46,7 +46,7 @@ var symbols = map[string]string{
 	"info":    "ℹ",
 }
 
-// normalize strips non-letters and lowercases, so "dark-gray", "DarkGray", "dark_gray" all become "darkgray".
+// strip non-letters and lowercases, "dark-gray", "DarkGray", "dark_gray" all become "darkgray".
 func normalize(input string) string {
 	var builder strings.Builder
 	for _, r := range input {
