@@ -20,8 +20,6 @@ jobs:
       matrix:
         os: ['linux', 'darwin', 'windows']
         arch: ['amd64']
-    outputs:
-      ${{ matrix.os }}_${{ matrix.arch }}_checksums: ${{ steps.checksum.outputs.checksums }}
     steps:
       - name: SETUP - Checkout
         uses: actions/checkout@v6
@@ -43,16 +41,8 @@ jobs:
           fi
           go build -ldflags "-s -w -X main.version=${VERSION}" -o "${BINARY_NAME}" ./cmd/poca
 
-      - name: BUILD - Generate SHA256 checksums
-        id: checksum
-        run: echo "checksums=$(sha256sum poca-* | tr '\n' '|')" >> $GITHUB_OUTPUT
-
       - name: DEBUG - List built artifact
-        run: |
-          echo "=== Artifact ==="
-          ls -la poca-*
-          echo "=== Checksum ==="
-          echo "${{ steps.checksum.outputs.checksums }}" | tr '|' '\n'
+        run: ls -la poca-*
 
       - name: PROVENANCE - Attest build artifacts
         if: env.ENABLE_ATTESTATION == 'true'
@@ -60,34 +50,37 @@ jobs:
         with:
           subject-path: 'poca-*'
 
-      - name: DEPLOY - Upload binary to release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" poca-* --clobber
+      - name: DEPLOY - Upload binary as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: poca-${{ matrix.os }}-${{ matrix.arch }}
+          path: poca-*
 
-  checksums:
-    name: Publish checksums
+  release:
+    name: Publish release assets
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: SETUP - Checkout
         uses: actions/checkout@v6
 
-      - name: BUILD - Assemble checksum file
-        uses: actions/github-script@v8
+      - name: FETCH - Download all build artifacts
+        uses: actions/download-artifact@v4
         with:
-          script: |
-            const outputs = ${{ toJSON(needs.build.outputs) }};
-            const lines = Object.values(outputs)
-              .filter(v => v)
-              .map(v => v.replace(/\|/g, '\n').trim())
-              .join('\n');
-            require('fs').writeFileSync('checksums-sha256.txt', lines + '\n');
+          pattern: poca-*
+          merge-multiple: true
 
-      - name: DEBUG - Show checksums
-        run: cat checksums-sha256.txt
+      - name: BUILD - Generate SHA256 checksums
+        run: sha256sum poca-* > checksums-sha256.txt
 
-      - name: DEPLOY - Upload checksums to release
+      - name: DEBUG - Show release contents
+        run: |
+          echo "=== Artifacts ==="
+          ls -la poca-*
+          echo "=== Checksums ==="
+          cat checksums-sha256.txt
+
+      - name: DEPLOY - Upload all assets to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" checksums-sha256.txt --clobber
+        run: gh release upload "${{ github.ref_name }}" poca-* checksums-sha256.txt --clobber
