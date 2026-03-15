@@ -1,4 +1,4 @@
-﻿name: DEBUG release events
+﻿name: DEBUG - Print Release Events
 on:
   release: {}
 jobs:
