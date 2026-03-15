@@ -3,6 +3,12 @@ name: DOCS - Generate Release Notes
 on:
   release:
     types: [edited]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to generate notes for (e.g. v0.5.0)"
+        required: true
+        type: string
 
 env:
   TRIGGER_MARKER: "^release-notes"
@@ -16,13 +22,15 @@ jobs:
   generate-notes:
     name: Generate release notes
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
     steps:
       - name: CHECK - Look for trigger marker
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BODY=$(gh release view "${{ github.event.release.tag_name }}" --json body -q .body --repo "${{ github.repository }}")
+          BODY=$(gh release view "${{ env.RELEASE_TAG }}" --json body -q .body --repo "${{ github.repository }}")
           if echo "$BODY" | grep -q "${{ env.TRIGGER_MARKER }}"; then
             echo "found=true" >> $GITHUB_OUTPUT
           else
@@ -50,7 +58,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          CURRENT="${{ github.event.release.tag_name }}"
+          CURRENT="${{ env.RELEASE_TAG }}"
           PREV=$(gh release list --exclude-drafts --exclude-pre-releases --json tagName -q '.[].tagName' --repo "${{ github.repository }}" | grep -v "^${CURRENT}$" | head -1)
           if [ -z "$PREV" ]; then
             echo "No previous release found, using initial commit"
@@ -65,7 +73,7 @@ jobs:
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_PAT }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          CURRENT="${{ github.event.release.tag_name }}"
+          CURRENT="${{ env.RELEASE_TAG }}"
           PREV="${{ steps.prev.outputs.tag }}"
 
           EXISTING_BODY=$(gh release view "$CURRENT" --json body -q .body --repo "${{ github.repository }}")
@@ -106,6 +114,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release edit "${{ github.event.release.tag_name }}" \
+          gh release edit "${{ env.RELEASE_TAG }}" \
             --notes-file release-notes.md \
             --repo "${{ github.repository }}"
