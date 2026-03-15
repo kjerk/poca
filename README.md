@@ -1,6 +1,6 @@
 # poca
 
-Colored terminal output, sections, and symbols for shell scripts. One binary, no runtime, no manual escape codes.
+Colored terminal output, sections, and symbols for shell scripts. One binary, no runtime, no manual escape codes. Automatically understands your terminal width, automatically understands non-interactive mode and skips if piped.
 
 <img src="docs/assets/poca_demo.png" width="640">
 
