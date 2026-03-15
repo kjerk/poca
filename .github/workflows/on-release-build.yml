@@ -18,17 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - os: linux
-            arch: amd64
-          - os: linux
-            arch: arm64
-          - os: darwin
-            arch: amd64
-          - os: darwin
-            arch: arm64
-          - os: windows
-            arch: amd64
+        os: ['linux', 'darwin', 'windows']
+        arch: ['amd64']
     outputs:
       ${{ matrix.os }}_${{ matrix.arch }}_checksums: ${{ steps.checksum.outputs.checksums }}
     steps:
