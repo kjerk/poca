@@ -6,7 +6,7 @@ Colored terminal output, sections, and symbols for shell scripts. One binary, no
 
 ## The problem
 
-Printing colored, structured output in bash means memorizing escape codes and managing resets by hand:
+Printing colored, structured output in bash, or batch, or writing from a binary means memorizing escape codes and managing resets by hand:
 
 ```bash
 BOLD='\033[1m'
@@ -22,7 +22,7 @@ echo -e "${GREEN}✓ Dependencies installed${RESET}"
 echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 ```
 
-The alternative is pulling in Python, Node, or another runtime just to get an ANSI formatted lines of text. Or god forbid you try to make wrapper functions in BASH that accept arguments.
+The alternative is pulling in Python, Node, PWSH or another runtime just to get an ANSI formatted lines of text. Or god forbid you try to make wrapper functions in BASH that accept arguments.
 
 ## The fix
 
