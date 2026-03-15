@@ -31,7 +31,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BODY=$(gh release view "${{ env.RELEASE_TAG }}" --json body -q .body --repo "${{ github.repository }}")
-          if echo "$BODY" | grep -q "${{ env.TRIGGER_MARKER }}"; then
+          if echo "$BODY" | grep -qF "${{ env.TRIGGER_MARKER }}"; then
             echo "found=true" >> $GITHUB_OUTPUT
           else
             echo "found=false" >> $GITHUB_OUTPUT
