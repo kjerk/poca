@@ -1,0 +1,11 @@
+﻿name: DEBUG release events
+on:
+  release: {}
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "action=${{ github.event.action }}"
+          echo "tag=${{ github.event.release.tag_name }}"
+          echo "draft=${{ github.event.release.draft }}"
