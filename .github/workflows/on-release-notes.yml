@@ -5,7 +5,7 @@ on:
     types: [edited]
 
 env:
-  TRIGGER_MARKER: "@release-notes"
+  TRIGGER_MARKER: "^release-notes"
   PROJECT_DESCRIPTION: "poca, a CLI tool for styled terminal output in shell scripts"
   COPILOT_MODEL: ""  # Leave empty for default, or set e.g. "gpt-4o"
 
