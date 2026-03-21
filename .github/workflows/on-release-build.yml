@@ -42,7 +42,7 @@ jobs:
         run: ls -la poca-*
 
       - name: DEPLOY - Upload binary as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: poca-${{ matrix.os }}-${{ matrix.arch }}
           path: poca-*
