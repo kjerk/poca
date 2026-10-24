@@ -40,7 +40,7 @@ jobs:
 
       - name: SETUP - Checkout
         if: steps.check.outputs.found == 'true'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
